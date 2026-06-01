@@ -48,8 +48,57 @@ const EXACT500_DATA: Segment[] = [
     ] as const;
 
 const EMPTY_DATA: Segment[] = [] as const;
+
+const UNSORTED_DATA: Segment[] = [
+  { x1: 300, x2: 600, y: 1, type: 'rail' },
+  { x1: 0, x2: 300, y: 1, type: 'rail' },
+] as const;
+
+const SINGLE_SEGMENT_DATA: Segment[] = [
+  { x1: 0, x2: 700, y: 1, type: 'rail' },
+] as const;
+
+const GAP_DATA: Segment[] = [
+  { x1: 0, x2: 300, y: 1, type: 'rail' },
+  { x1: 400, x2: 800, y: 1, type: 'rail' },
+] as const;
+
+const PRECISION_DATA: Segment[] = [
+  { x1: 0, x2: 300, y: 1, type: 'rail' },
+  { x1: 300.0000005, x2: 600.0000005, y: 1, type: 'rail' },
+] as const;
+
 describe("findThermalBreaks function:",() => {
-    test('provided data set', () => {
+  
+  test("Empty data set returns empty", () => {   
+    expect(findThermalBreaks(EMPTY_DATA)).toEqual([]);
+  });
+
+    test("Does not place a break at exactly 500", () => {   
+      expect(findThermalBreaks(EXACT500_DATA)).toEqual([]);
+    });
+
+    test("Manages unsorted data", () => {   
+      expect(findThermalBreaks(UNSORTED_DATA)).toEqual([
+        { "x": 300, "y": 1 }
+      ]);
+    });
+
+      test("Does not break a single 'too long' segment", () => {   
+      expect(findThermalBreaks(SINGLE_SEGMENT_DATA)).toEqual([]);
+    });
+
+    test("Detects gaps between segments", () => {   
+      expect(findThermalBreaks(GAP_DATA)).toEqual([]);
+    });
+   
+    test("Considers continuity at precision edgecase", () => {   
+      expect(findThermalBreaks(PRECISION_DATA)).toEqual([
+        { "x": 300, "y": 1 }
+      ]);
+    });
+
+    test('Provided data set test', () => {
       expect(findThermalBreaks(INPUT_DATA)).toEqual([
       { "x": 335, "y": 54.08 },
       { "x": 671, "y": 54.08 },
@@ -57,11 +106,4 @@ describe("findThermalBreaks function:",() => {
       { "x": 671, "y": 80.87 }
         ])  
     })
-    test("Does not place a break at exactly 500", () => {   
-      expect(findThermalBreaks(EXACT500_DATA)).toEqual([]);
-    });
-    test("Empty data set", () => {   
-      expect(findThermalBreaks(EMPTY_DATA)).toEqual([]);
-    });
-   
 })
